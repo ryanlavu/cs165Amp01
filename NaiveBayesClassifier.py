@@ -5,6 +5,7 @@ from math import pi
 from math import exp
 import numpy as np 
 import pandas as pd
+import statistics
 
 n = len(sys.argv)
 
@@ -121,11 +122,19 @@ for feature in listCont:
     std_dev[feature] = {}
     for outcome in np.unique(trainingClass_Y):
         abc = file0Read[file0Read["Label"] == outcome]
+        abc = abc.drop(['Hotel-Type', 'Arrival-Date-Month', 'Meal-Request', 'Market-Segment-Designation',
+'Booking-Distribution-Channel', 'Reserved-Room-Type', 'Deposit-Type', 'Customer-Type', 'Is-Repeated-Guest', 'Label'], axis=1)
+        print("ABC=",abc)
         #FIX MEAN AND STD DEV
-        meanD[feature][outcome] = abc.mean()
-        std_dev[feature][outcome] = abc.std()
-#print("MEAN OF ADULTS = 0", meanD["Adults"][0])
-#print("STD OF ADULTS = 0", std_dev["Adults"][0])
+        #meanD[feature][outcome] = abc.mean()
+        #std_dev[feature][outcome] = abc.std()
+        res = abc[feature]
+        meanD[feature][outcome] = statistics.mean(res)
+        std_dev[feature][outcome] = statistics.stdev(res)
+#print(meanD)
+#print(std_dev)
+#print("MEAN OF ADULTS = 0", meanD["Children"][1])
+#print("STD OF ADULTS = 0", std_dev["Children"][0])
 
 file0AndBayes_stop = perf_counter()
 print("Elapsed time of opening the training file and training a Naive Bayes classifier: ", file0AndBayes_stop - file0AndBayes_start)
@@ -147,12 +156,12 @@ for ind in file0Read.index:
     if(rowAccuracy > 0.5):
         totalAccurate = totalAccurate + 1
 totalAccurateRate = totalAccurate / numTrainingRows
-print("The accuracy rate of our bayes network on the training set was ", totalAccurateRate*100, "%\n")
+print("The accuracy rate of our bayes network on the training set was ", totalAccurateRate*100, " seconds")
 
 
 numTrainingRows2 = file1Read.shape[0]
 #CALCULATING ACCURACY WITH testing.txt
-print("Accuracy of built classifier on testing.txt\n")
+#print("Accuracy of built classifier on testing.txt\n")
 totalAccurate = 0
 totalAccurateRate = 0
 rowAccuracyYes = 1
@@ -189,7 +198,14 @@ for ind in range(numTrainingRows2):
         if feature in listCont:
             #Continuous
             #print("con")
-            pass
+            #print("ZERO CHECK, 0 = ", (std_dev[feature][0.0]*std_dev[feature][0.0]), "FEATURE = ", feature)
+            #print("ZERO CHECK, 1 = ", (std_dev[feature][1.0]*std_dev[feature][1.0]), "FEATURE = ", feature)
+            if((std_dev[feature][1.0]*std_dev[feature][1.0]) != 0):
+                rowAccuracyYes = rowAccuracyYes * (1/sqrt(2*3.14*std_dev[feature][1.0]*std_dev[feature][1.0]))*exp(-0.5 * pow((feat_val - meanD[feature][1.0]),2)/(std_dev[feature][1.0]*std_dev[feature][1.0]))
+            if((std_dev[feature][0.0]*std_dev[feature][0.0]) != 0):
+                rowAccuracyNo = rowAccuracyNo * (1/sqrt(2*3.14*std_dev[feature][0.0]*std_dev[feature][0.0]))*exp(-0.5 * pow((feat_val - meanD[feature][0.0]),2)/(std_dev[feature][0.0]*std_dev[feature][0.0]))
+
+            
     if (rowAccuracyNo > rowAccuracyYes):
         if file1Read.iloc[ind]["Label"] == 0:
             totalAccurate = totalAccurate + 1
@@ -201,4 +217,4 @@ totalAccurateRate = totalAccurate / numTrainingRows2
 
 print("The accuracy rate of our bayes network on the testing set was ", totalAccurateRate*100, "%\n")
 applyBayesOnfiles_stop = perf_counter()
-print("Elapsed time of finding the accuracy of calculated bayes network on both training.txt and testing.txt: ", applyBayesOnfiles_stop - applyBayesOnfiles_start)
+print("Elapsed time of finding the accuracy of calculated bayes network on both training.txt and testing.txt: ", applyBayesOnfiles_stop - applyBayesOnfiles_start, " seconds")
