@@ -17,15 +17,22 @@ file1 = sys.argv[2]
 
 file0AndBayes_start = perf_counter()
 
+
 file0Read = pd.read_csv(file0)
 file1Read = pd.read_csv(file1)
-
+#print(file1Read[0])
+#sys.stderr.print(file1Read)
 #WORK ON LATER, FIRST ROW IS PAVED OVER FOR THE COLUMN LABELS
 file0Read.columns = ['Hotel-Type', 'Arrival-Date-Month', 'Meal-Request', 'Market-Segment-Designation',
 'Booking-Distribution-Channel', 'Reserved-Room-Type', 'Deposit-Type', 'Customer-Type', 'Days-fromReservation-to-Arrival', 
 'Arrival-Date-Week-Number', 'Arrival-Date-Day-of-Month', 'Stays-inWeekend-Nights', 'Stays-in-Weekday-Nights', 'Adults', 
 'Children', 'Babies', 'Is-Repeated-Guest', 'Previous-Cancellations', 'Previous-Booking-Not-Cancelled', 
 'Requested-Car-Parking-Spaces', 'Total-ofSpecial-Requests', 'Average-Daily-Rate', 'Label']
+#file1Read.columns = ['Hotel-Type', 'Arrival-Date-Month', 'Meal-Request', 'Market-Segment-Designation',
+#'Booking-Distribution-Channel', 'Reserved-Room-Type', 'Deposit-Type', 'Customer-Type', 'Days-fromReservation-to-Arrival', 
+#'Arrival-Date-Week-Number', 'Arrival-Date-Day-of-Month', 'Stays-inWeekend-Nights', 'Stays-in-Weekday-Nights', 'Adults', 
+#'Children', 'Babies', 'Is-Repeated-Guest', 'Previous-Cancellations', 'Previous-Booking-Not-Cancelled', 
+#'Requested-Car-Parking-Spaces', 'Total-ofSpecial-Requests', 'Average-Daily-Rate', 'Label']
 file1Read.columns = ['Hotel-Type', 'Arrival-Date-Month', 'Meal-Request', 'Market-Segment-Designation',
 'Booking-Distribution-Channel', 'Reserved-Room-Type', 'Deposit-Type', 'Customer-Type', 'Days-fromReservation-to-Arrival', 
 'Arrival-Date-Week-Number', 'Arrival-Date-Day-of-Month', 'Stays-inWeekend-Nights', 'Stays-in-Weekday-Nights', 'Adults', 
@@ -124,7 +131,7 @@ for feature in listCont:
         abc = file0Read[file0Read["Label"] == outcome]
         abc = abc.drop(['Hotel-Type', 'Arrival-Date-Month', 'Meal-Request', 'Market-Segment-Designation',
 'Booking-Distribution-Channel', 'Reserved-Room-Type', 'Deposit-Type', 'Customer-Type', 'Is-Repeated-Guest', 'Label'], axis=1)
-        print("ABC=",abc)
+        #print("ABC=",abc)
         #FIX MEAN AND STD DEV
         #meanD[feature][outcome] = abc.mean()
         #std_dev[feature][outcome] = abc.std()
@@ -137,7 +144,7 @@ for feature in listCont:
 #print("STD OF ADULTS = 0", std_dev["Children"][0])
 
 file0AndBayes_stop = perf_counter()
-print("Elapsed time of opening the training file and training a Naive Bayes classifier: ", file0AndBayes_stop - file0AndBayes_start)
+print("Elapsed time of opening the training file and training a Naive Bayes classifier: ", file0AndBayes_stop - file0AndBayes_start, "seconds")
 
 #CALCULATING ACCURACY WITH training.txt
 applyBayesOnfiles_start = perf_counter()
@@ -156,7 +163,7 @@ for ind in file0Read.index:
     if(rowAccuracy > 0.5):
         totalAccurate = totalAccurate + 1
 totalAccurateRate = totalAccurate / numTrainingRows
-print("The accuracy rate of our bayes network on the training set was ", totalAccurateRate*100, " seconds")
+print("The accuracy rate of our bayes network on the training set was ", totalAccurateRate*100, " %")
 
 
 numTrainingRows2 = file1Read.shape[0]
@@ -200,10 +207,11 @@ for ind in range(numTrainingRows2):
             #print("con")
             #print("ZERO CHECK, 0 = ", (std_dev[feature][0.0]*std_dev[feature][0.0]), "FEATURE = ", feature)
             #print("ZERO CHECK, 1 = ", (std_dev[feature][1.0]*std_dev[feature][1.0]), "FEATURE = ", feature)
+            pi = 3.14
             if((std_dev[feature][1.0]*std_dev[feature][1.0]) != 0):
-                rowAccuracyYes = rowAccuracyYes * (1/sqrt(2*3.14*std_dev[feature][1.0]*std_dev[feature][1.0]))*exp(-0.5 * pow((feat_val - meanD[feature][1.0]),2)/(std_dev[feature][1.0]*std_dev[feature][1.0]))
+                rowAccuracyYes = rowAccuracyYes * (1/sqrt(2*pi*std_dev[feature][1.0]*std_dev[feature][1.0]))*exp(-0.5 * pow((feat_val - meanD[feature][1.0]),2)/(std_dev[feature][1.0]*std_dev[feature][1.0]))
             if((std_dev[feature][0.0]*std_dev[feature][0.0]) != 0):
-                rowAccuracyNo = rowAccuracyNo * (1/sqrt(2*3.14*std_dev[feature][0.0]*std_dev[feature][0.0]))*exp(-0.5 * pow((feat_val - meanD[feature][0.0]),2)/(std_dev[feature][0.0]*std_dev[feature][0.0]))
+                rowAccuracyNo = rowAccuracyNo * (1/sqrt(2*pi*std_dev[feature][0.0]*std_dev[feature][0.0]))*exp(-0.5 * pow((feat_val - meanD[feature][0.0]),2)/(std_dev[feature][0.0]*std_dev[feature][0.0]))
 
             
     if (rowAccuracyNo > rowAccuracyYes):
