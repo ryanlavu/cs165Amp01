@@ -32,11 +32,11 @@ file1Read.columns = ['Hotel-Type', 'Arrival-Date-Month', 'Meal-Request', 'Market
 'Requested-Car-Parking-Spaces', 'Total-ofSpecial-Requests', 'Average-Daily-Rate', 'Label']
 #print("\n",file0Read)
 #print(file0Read.shape)
-print("\n-----------------------------------------------------------------------------------------------------------\n")
-print("-----------------------------------------------------------------------------------------------------------\n")
-print("-----------------------------------------------------------------------------------------------------------\n")
-print("-----------------------------------------------------------------------------------------------------------\n")
-print("-----------------------------------------------------------------------------------------------------------\n")
+#print("\n-----------------------------------------------------------------------------------------------------------\n")
+#print("-----------------------------------------------------------------------------------------------------------\n")
+#print("-----------------------------------------------------------------------------------------------------------\n")
+#print("-----------------------------------------------------------------------------------------------------------\n")
+#print("-----------------------------------------------------------------------------------------------------------\n")
 #file0Read.info()
 
 #Want to preprocess to now
@@ -94,7 +94,7 @@ for feature in listDiscrete:
         #print("OUTCOME ", outcome, "\n")
         #for feature_value in file0Read[feature].unique():
         for outcome in np.unique(trainingClass_Y):
-            print("FEATURE_VALUE",feature_value)
+            #print("FEATURE_VALUE",feature_value)
             prob_features_liklihoods[feature][feature_value] = {}
             num_count = sum(file0Read[feature] == feature_value)
             #FIX LATER
@@ -108,8 +108,8 @@ for feature in listDiscrete:
             prob_features_liklihoods[feature][feature_value][outcome] = sum_count / sum_count2
             #prob_features_liklihoods[feature][feature_value].append({outcome : sum_count / sum_count2})
             #prob_features_liklihoods[feature][feature_value].append({1-outcome : 1-sum_count / sum_count2})
-            print("OUTCOME = ", outcome, " AND prob_features_liklihoods = ", prob_features_liklihoods)
-print(prob_features_liklihoods)
+            #print("OUTCOME = ", outcome, " AND prob_features_liklihoods = ", prob_features_liklihoods)
+#print(prob_features_liklihoods)
 
 #{'Hotel-Type': {'City Hotel_1.0': [{1.0: 0.5494719807464885}, {0.0: 0.64}], 'Resort Hotel': {1.0: 0.39431687206312616}}
 
@@ -124,8 +124,8 @@ for feature in listCont:
         #FIX MEAN AND STD DEV
         meanD[feature][outcome] = abc.mean()
         std_dev[feature][outcome] = abc.std()
-print("MEAN OF ADULTS = 0", meanD["Adults"][0])
-print("STD OF ADULTS = 0", std_dev["Adults"][0])
+#print("MEAN OF ADULTS = 0", meanD["Adults"][0])
+#print("STD OF ADULTS = 0", std_dev["Adults"][0])
 
 file0AndBayes_stop = perf_counter()
 print("Elapsed time of opening the training file and training a Naive Bayes classifier: ", file0AndBayes_stop - file0AndBayes_start)
@@ -160,7 +160,7 @@ rowAccuracyNo = 1
 
 for ind in range(numTrainingRows2):
     #print(file0Read['Hotel-Type'][ind])
-    print("IND = ", ind)
+    #print("IND = ", ind)
     rowAccuracyYes = 1
     rowAccuracyNo = 1
     for feature in listFeatures:
@@ -185,10 +185,11 @@ for ind in range(numTrainingRows2):
             #print("prob = ",prob_features_liklihoods[feature][feat_val])
             rowAccuracyYes = rowAccuracyYes * prob_features_liklihoods[feature][feat_val][1.0]
             rowAccuracyNo = rowAccuracyNo * (1 - prob_features_liklihoods[feature][feat_val][1.0])
-            print("YES = ", rowAccuracyYes, "NO = ", rowAccuracyNo)
+            #print("YES = ", rowAccuracyYes, "NO = ", rowAccuracyNo)
         if feature in listCont:
             #Continuous
-            print("con")
+            #print("con")
+            pass
     if (rowAccuracyNo > rowAccuracyYes):
         if file1Read.iloc[ind]["Label"] == 0:
             totalAccurate = totalAccurate + 1
